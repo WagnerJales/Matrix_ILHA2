@@ -1,15 +1,13 @@
-
+import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# Carregar o arquivo CSV
-df = pd.read_csv("Pesquisa_Origem_Destino_RMGSL.csv")
+st.title("Visualização OD RMGSL")
 
-# Gerar matriz OD
+df = pd.read_csv("Pesquisa_Origem_Destino_RMGSL.csv")
 od_matrix = df.groupby(['Qual o município de ORIGEM', 'Qual o município de DESTINO']).size().reset_index(name='Viagens')
 od_matrix_filtered = od_matrix[od_matrix['Viagens'] > 0]
 
-# Coordenadas
 municipios_coords = {
     "São Luís": (-2.5307, -44.3068),
     "Paço do Lumiar": (-2.5169, -44.1067),
@@ -28,7 +26,6 @@ od_matrix_filtered['Origem_lon'] = od_matrix_filtered['Qual o município de ORIG
 od_matrix_filtered['Destino_lat'] = od_matrix_filtered['Qual o município de DESTINO'].map(lambda x: municipios_coords.get(x, (None, None))[0])
 od_matrix_filtered['Destino_lon'] = od_matrix_filtered['Qual o município de DESTINO'].map(lambda x: municipios_coords.get(x, (None, None))[1])
 
-# Plot
 fig = px.scatter_mapbox(od_matrix_filtered,
                         lat="Origem_lat",
                         lon="Origem_lon",
@@ -48,4 +45,5 @@ fig.update_layout(mapbox_style="open-street-map",
                   title="Fluxos OD RMGSL - Pesquisa Eletrônica",
                   showlegend=False)
 
-fig.show()
+st.plotly_chart(fig)
+
